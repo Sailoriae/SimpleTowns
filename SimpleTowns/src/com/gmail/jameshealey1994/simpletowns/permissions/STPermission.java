@@ -1,5 +1,8 @@
 package com.gmail.jameshealey1994.simpletowns.permissions;
 
+import java.util.HashMap;
+
+import org.bukkit.Bukkit;
 import org.bukkit.permissions.Permission;
 
 /**
@@ -91,13 +94,20 @@ public enum STPermission {
     public String getName() {
         return name;
     }
-
+    
+    private HashMap<String, Permission> permissionMap = new HashMap<String, Permission>();
+    
     /**
      * Returns Permission of the enum.
      *
      * @return  Permission of the enum
      */
     public Permission getPermission() {
-        return new Permission(this.getName());
+        
+        if(!permissionMap.containsKey(this.getName().toLowerCase())) {
+            permissionMap.put(this.getName().toLowerCase(), new Permission(this.getName()));
+        }
+        
+        return permissionMap.get(this.getName().toLowerCase());
     }
 }
