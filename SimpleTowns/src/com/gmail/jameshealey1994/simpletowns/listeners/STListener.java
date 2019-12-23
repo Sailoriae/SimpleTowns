@@ -11,6 +11,8 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.ItemFrame;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -21,6 +23,7 @@ import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 
 /**
  * Listener class for SimpleTowns plugin.
@@ -84,7 +87,7 @@ public class STListener implements Listener {
     }
 
     /**
-     * Checks the player is allowed to break the item in an ItemFrame.
+     * Checks the player is allowed to break the item in an ItemFrame or an ArmorStand.
      *
      *
      * @param event     event being handled
@@ -111,6 +114,32 @@ public class STListener implements Listener {
         }
 
         final Block block = event.getEntity().getLocation().getBlock();
+        if (!canBuild(player, block)) {
+            final Town town = plugin.getTown(block.getChunk());
+            if (town == null) {
+                player.sendMessage(plugin.getLocalisation().get(LocalisationEntry.MSG_CANNOT_BUILD_HERE));
+            } else {
+                player.sendMessage(plugin.getLocalisation().get(LocalisationEntry.MSG_ONLY_TOWN_MEMBERS_CAN_BREAK_BLOCKS, town.getName()));
+            }
+            event.setCancelled(true);
+        }
+    }
+
+    /**
+     * Checks the player is allowed to add or remove item in an ItemFrame or an ArmorStand.
+     *
+     *
+     * @param event     event being handled
+     */
+    @EventHandler (priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onArmorStandModifyEvent(PlayerInteractAtEntityEvent event) {
+
+        if ( !(event.getRightClicked() instanceof ArmorStand) && !(event.getRightClicked() instanceof ItemFrame) ) {
+            return;
+        }
+
+        final Player player = (Player) event.getPlayer();
+        final Block block = event.getRightClicked().getLocation().getBlock();
         if (!canBuild(player, block)) {
             final Town town = plugin.getTown(block.getChunk());
             if (town == null) {
