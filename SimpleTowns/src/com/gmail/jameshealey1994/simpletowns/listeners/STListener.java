@@ -92,7 +92,7 @@ public class STListener implements Listener {
     @EventHandler (priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onItemFrameBreakEvent(EntityDamageByEntityEvent event) {
 
-        if (event.getEntityType() != EntityType.ITEM_FRAME) {
+        if ( (event.getEntityType() != EntityType.ITEM_FRAME) && (event.getEntityType() != EntityType.ARMOR_STAND) ) {
             return;
         }
 
