@@ -5,6 +5,8 @@ name: SimpleTowns
 main: com.gmail.jameshealey1994.simpletowns.SimpleTowns
 version: 2.0
 
+api-version: 1.15
+
 commands:
     towns:
         aliases: [town, simpletown, simpletowns]
