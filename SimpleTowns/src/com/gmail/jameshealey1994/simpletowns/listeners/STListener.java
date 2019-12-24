@@ -24,9 +24,12 @@ import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerTakeLecternBookEvent;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.type.Lectern;
 
 /**
  * Listener class for SimpleTowns plugin.
@@ -96,7 +99,7 @@ public class STListener implements Listener {
      * @param event     event being handled
      */
     @EventHandler (priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onItemFrameBreakEvent(EntityDamageByEntityEvent event) {
+    public void onEntityDamageByEntityEvent(EntityDamageByEntityEvent event) {
 
         if ( (event.getEntityType() != EntityType.ITEM_FRAME) && (event.getEntityType() != EntityType.ARMOR_STAND) ) {
             return;
@@ -130,12 +133,12 @@ public class STListener implements Listener {
 
     /**
      * Checks the player is allowed to add or remove item in an ItemFrame or an ArmorStand.
-     *
+     * Note : PlayerInteractEntityEvent is for right-clicking on an entity.
      *
      * @param event     event being handled
      */
     @EventHandler (priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onArmorStandModifyEvent(PlayerInteractAtEntityEvent event) {
+    public void onPlayerInteractEntityEvent(PlayerInteractEntityEvent event) {
 
         if ( !(event.getRightClicked() instanceof ArmorStand) && !(event.getRightClicked() instanceof ItemFrame) ) {
             return;
@@ -155,24 +158,47 @@ public class STListener implements Listener {
     }
 
     /**
-     * Checks the player is allowed to right click on a lectern, and item frame, or an armor stand.
-     *
+     * Same as previous method
+     * Useful for armor stands
+     * Note : PlayerInteractAtEntityEvent is for right-clicking on an entity.
      *
      * @param event     event being handled
      */
     @EventHandler (priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onArmorStandModifyEvent(PlayerInteractEvent event) {
+    public void onPlayerInteractAtEntityEvent(PlayerInteractAtEntityEvent event) {
+
+        if ( !(event.getRightClicked() instanceof ArmorStand) && !(event.getRightClicked() instanceof ItemFrame) ) {
+            return;
+        }
+
+        onPlayerInteractEntityEvent( (PlayerInteractEntityEvent) event );
+    }
+
+    /**
+     * Checks the player is allowed to right click on a lectern, and item frame, or an armor stand.
+     * Note : PlayerInteractEvent is for right-clicking on a block.
+     *
+     * @param event     event being handled
+     */
+    @EventHandler (priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onPlayerInteractEvent(PlayerInteractEvent event) {
 
         if ( event.getClickedBlock().getType() != Material.LECTERN &&
              event.getClickedBlock().getType() != Material.ITEM_FRAME &&
-             event.getClickedBlock().getType() != Material.LEGACY_ITEM_FRAME &&
-             event.getClickedBlock().getType() != Material.ARMOR_STAND &&
-             event.getClickedBlock().getType() != Material.LEGACY_ARMOR_STAND ) {
+             event.getClickedBlock().getType() != Material.ARMOR_STAND ) {
             return;
         }
 
         final Player player = (Player) event.getPlayer();
         final Block block = event.getClickedBlock();
+
+        // Allow reading a book in a lectern
+		if ( block.getBlockData() instanceof Lectern ) {
+			final Lectern lectern = (Lectern) block.getBlockData();
+			if ( lectern.hasBook() )
+				return;
+		}
+
         if (!canBuild(player, block)) {
             final Town town = plugin.getTown(block.getChunk());
             if (town == null) {
@@ -191,7 +217,7 @@ public class STListener implements Listener {
      * @param event     event being handled
      */
     @EventHandler (priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onArmorStandModifyEvent(PlayerTakeLecternBookEvent event) {
+    public void onPlayerTakeLecternBookEvent(PlayerTakeLecternBookEvent event) {
 
         final Player player = (Player) event.getPlayer();
         final Block block = event.getLectern().getLocation().getBlock();
