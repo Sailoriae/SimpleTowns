@@ -93,7 +93,7 @@ public class STListener implements Listener {
     }
 
     /**
-     * Checks the player is allowed to break the item in an ItemFrame or an ArmorStand.
+     * Checks the player is allowed to break the item in an ItemFrame, or the ItemFrame itself, or an ArmorStand.
      *
      *
      * @param event     event being handled
@@ -140,7 +140,7 @@ public class STListener implements Listener {
     @EventHandler (priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlayerInteractEntityEvent(PlayerInteractEntityEvent event) {
 
-        if ( !(event.getRightClicked() instanceof ArmorStand) && !(event.getRightClicked() instanceof ItemFrame) ) {
+        if ( !(event.getRightClicked() instanceof ItemFrame) && !(event.getRightClicked() instanceof ArmorStand) ) {
             return;
         }
 
@@ -158,8 +158,7 @@ public class STListener implements Listener {
     }
 
     /**
-     * Same as previous method
-     * Useful for armor stands
+     * Checks the player is allowed to add or remove item in an ArmorStand.
      * Note : PlayerInteractAtEntityEvent is for right-clicking on an entity.
      *
      * @param event     event being handled
@@ -167,7 +166,7 @@ public class STListener implements Listener {
     @EventHandler (priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlayerInteractAtEntityEvent(PlayerInteractAtEntityEvent event) {
 
-        if ( !(event.getRightClicked() instanceof ArmorStand) && !(event.getRightClicked() instanceof ItemFrame) ) {
+        if ( !(event.getRightClicked() instanceof ArmorStand) ) {
             return;
         }
 
@@ -185,19 +184,30 @@ public class STListener implements Listener {
 
         if ( event.getClickedBlock().getType() != Material.LECTERN &&
              event.getClickedBlock().getType() != Material.ITEM_FRAME &&
-             event.getClickedBlock().getType() != Material.ARMOR_STAND ) {
+             event.getClickedBlock().getType() != Material.ARMOR_STAND ) { // This is why "api-version" is important
             return;
         }
 
         final Player player = (Player) event.getPlayer();
         final Block block = event.getClickedBlock();
 
-        // Allow reading a book in a lectern
-		if ( block.getBlockData() instanceof Lectern ) {
-			final Lectern lectern = (Lectern) block.getBlockData();
-			if ( lectern.hasBook() )
-				return;
-		}
+        if ( block.getBlockData() instanceof Lectern ) {
+            final Lectern lectern = (Lectern) block.getBlockData();
+            
+            // Allow reading a book in a lectern
+            if ( lectern.hasBook() )
+                return;
+            
+            // Allow right-clicking without a book
+            if ( event.getMaterial​() != Material.WRITABLE_BOOK )  // This is also why "api-version" is important
+                return;
+        }
+
+        // Allow right-clicking with nothing on an item frame
+        // onPlayerInteractEntityEvent() will cancel rotation
+        if ( block.getBlockData() instanceof ItemFrame )
+            if ( event.getMaterial​() != Material.AIR )
+                return;
 
         if (!canBuild(player, block)) {
             final Town town = plugin.getTown(block.getChunk());
