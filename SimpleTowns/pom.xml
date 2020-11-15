@@ -7,6 +7,8 @@
   <version>2.0</version>
   <packaging>jar</packaging>
   <properties>
+    <spigot.api.version>1.16</spigot.api.version>
+    <spigot.version>1.16.4-R0.1-SNAPSHOT</spigot.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
@@ -21,7 +23,7 @@
       <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.15-R0.1-SNAPSHOT</version>
+            <version>${spigot.version}</version>
             <scope>provided</scope>
       </dependency>
   </dependencies>
@@ -34,6 +36,7 @@
           <include>plugin.yml</include>
           <include>config.yml</include>
         </includes>
+        <filtering>true</filtering>
       </resource>
     </resources>
   </build>
