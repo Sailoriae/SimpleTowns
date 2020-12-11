@@ -62,7 +62,7 @@ public class NameValidityChecker {
      */
     private boolean containsSpecialChar() {
         // http://stackoverflow.com/a/8248352/1735524
-        final Pattern p = Pattern.compile("[^a-zA-Z0-9_]");
+        final Pattern p = Pattern.compile("[^a-zA-Z0-9_-]");
         return p.matcher(possibleName).find();
     }
 }
