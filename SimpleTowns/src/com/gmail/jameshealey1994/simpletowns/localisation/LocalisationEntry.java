@@ -202,6 +202,15 @@ public enum LocalisationEntry {
             "&cPlayer name '%1$s' is invalid"),
 
     /**
+     * Message telling user that there is no UUID for the player name they entered.
+     * %1$s - player name
+     */
+    ERR_CANNOT_FIND_PLAYER_UUID (
+            "MsgCannotFindPlayerUUID",
+            "%1$s - player name",
+            "&cPlayer name '%1$s' doesn't exists"),
+
+    /**
      * Message telling player they attacked another player, and how much damage
      * they inflicted on that player.
      * Only shown when in debug mode.

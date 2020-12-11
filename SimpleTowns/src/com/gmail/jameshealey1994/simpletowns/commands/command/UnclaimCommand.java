@@ -57,7 +57,7 @@ public class UnclaimCommand extends STCommand {
         }
 
         // Check player is a leader of that town.
-        if (!(town.getLeaders().contains(sender.getName())) && !sender.hasPermission(STPermission.ADMIN.getPermission())) {
+        if (!(town.getLeaders().contains(player.getUniqueId())) && !sender.hasPermission(STPermission.ADMIN.getPermission())) {
             sender.sendMessage(localisation.get(LocalisationEntry.ERR_NOT_LEADER, town.getName()));
             return true;
         }

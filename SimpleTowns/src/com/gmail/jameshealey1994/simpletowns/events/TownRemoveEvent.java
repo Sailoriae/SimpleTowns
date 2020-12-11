@@ -5,6 +5,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import java.util.UUID;
 
 /**
  * Town Remove Event.
@@ -36,6 +37,11 @@ public class TownRemoveEvent extends Event implements Cancellable {
     private final String removedName;
 
     /**
+     * The UUID of the player about to be removed from the town.
+     */
+    private final UUID removedUUID;
+
+    /**
      * If the event is cancelled.
      */
     private boolean cancelled = false;
@@ -46,11 +52,13 @@ public class TownRemoveEvent extends Event implements Cancellable {
      * @param town          town the player is about to be removed from
      * @param sender        sender of the command to remove the player
      * @param removedName   name of the player about to be removed from the town
+     * @param removedUUID   UUID of the player about to be removed from the town
      */
-    public TownRemoveEvent(Town town, CommandSender sender, String removedName) {
+    public TownRemoveEvent(Town town, CommandSender sender, String removedName, UUID removedUUID) {
         this.town = town;
         this.sender = sender;
         this.removedName = removedName;
+        this.removedUUID = removedUUID;
     }
 
     /**

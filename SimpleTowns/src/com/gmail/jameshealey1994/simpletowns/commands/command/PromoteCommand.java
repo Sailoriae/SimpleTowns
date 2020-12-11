@@ -6,7 +6,9 @@ import com.gmail.jameshealey1994.simpletowns.localisation.LocalisationEntry;
 import com.gmail.jameshealey1994.simpletowns.object.Town;
 import com.gmail.jameshealey1994.simpletowns.permissions.STPermission;
 import com.gmail.jameshealey1994.simpletowns.utils.Logger;
+import com.gmail.jameshealey1994.simpletowns.utils.PlayernameUUID;
 import java.util.List;
+import java.util.UUID;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -81,9 +83,12 @@ public class PromoteCommand extends STCommand {
         }
 
         // Check sender is a leader of that town.
-        if ((sender instanceof Player) && !(town.getLeaders().contains(sender.getName())) && !sender.hasPermission(STPermission.ADMIN.getPermission())) {
-            sender.sendMessage(localisation.get(LocalisationEntry.ERR_NOT_LEADER, town.getName()));
-            return true;
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
+            if (!town.getLeaders().contains(player.getUniqueId()) && !sender.hasPermission(STPermission.ADMIN.getPermission())) {
+                sender.sendMessage(localisation.get(LocalisationEntry.ERR_NOT_LEADER, town.getName()));
+                return true;
+            }
         }
 
         // Get player's full name
@@ -95,8 +100,15 @@ public class PromoteCommand extends STCommand {
             fullPlayerName = player.getName();
         }
 
+        // Validate playername UUID
+        UUID playerUUID = PlayernameUUID.getPlayerUUID( fullPlayerName );
+        if (playerUUID == null) {
+            sender.sendMessage(localisation.get(LocalisationEntry.ERR_CANNOT_FIND_PLAYER_UUID, fullPlayerName));
+            return true;
+        }
+
         // Check player is a member of the town
-        if (!town.hasMember(fullPlayerName)) {
+        if (!town.hasMember(playerUUID)) {
             sender.sendMessage(localisation.get(LocalisationEntry.ERR_PLAYER_NOT_MEMBER, fullPlayerName, town.getName()));
             return true;
         }
@@ -112,15 +124,15 @@ public class PromoteCommand extends STCommand {
         final String basePath = "Towns." + town.getName();
         final String citizensPath = basePath + ".Citizens";
         final List<String> citizens = plugin.getConfig().getStringList(citizensPath);
-        citizens.remove(fullPlayerName);
+        citizens.remove(playerUUID.toString());
         plugin.getConfig().set(citizensPath, citizens);
-        plugin.getTown(town.getName()).getCitizens().remove(fullPlayerName);
+        plugin.getTown(town.getName()).getCitizens().remove(playerUUID);
 
         final String leadersPath = basePath + ".Leaders";
         final List<String> leaders = plugin.getConfig().getStringList(leadersPath);
-        leaders.add(fullPlayerName);
+        leaders.add(playerUUID.toString());
         plugin.getConfig().set(leadersPath, leaders);
-        plugin.getTown(town.getName()).getLeaders().add(fullPlayerName);
+        plugin.getTown(town.getName()).getLeaders().add(playerUUID);
 
         // Log to file
         new Logger(plugin).log(localisation.get(LocalisationEntry.LOG_CITIZEN_PROMOTED, town.getName(), sender.getName(), fullPlayerName));

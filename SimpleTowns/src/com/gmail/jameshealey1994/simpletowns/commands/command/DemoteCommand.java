@@ -6,7 +6,9 @@ import com.gmail.jameshealey1994.simpletowns.localisation.LocalisationEntry;
 import com.gmail.jameshealey1994.simpletowns.object.Town;
 import com.gmail.jameshealey1994.simpletowns.permissions.STPermission;
 import com.gmail.jameshealey1994.simpletowns.utils.Logger;
+import com.gmail.jameshealey1994.simpletowns.utils.PlayernameUUID;
 import java.util.List;
+import java.util.UUID;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -81,19 +83,29 @@ public class DemoteCommand extends STCommand {
         }
 
         // Check sender is a leader of that town.
-        if ((sender instanceof Player) && !(town.getLeaders().contains(sender.getName())) && !sender.hasPermission(STPermission.ADMIN.getPermission())) {
-            sender.sendMessage(localisation.get(LocalisationEntry.ERR_NOT_LEADER, town.getName()));
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
+            if (!town.getLeaders().contains(player.getUniqueId()) && !sender.hasPermission(STPermission.ADMIN.getPermission())) {
+                sender.sendMessage(localisation.get(LocalisationEntry.ERR_NOT_LEADER, town.getName()));
+                return true;
+            }
+        }
+
+        // Validate playername UUID
+        UUID playerUUID = PlayernameUUID.getPlayerUUID( playername );
+        if (playerUUID == null) {
+            sender.sendMessage(localisation.get(LocalisationEntry.ERR_CANNOT_FIND_PLAYER_UUID, playername));
             return true;
         }
 
         // Check player is a member of the town
-        if (!town.hasMember(playername)) {
+        if (!town.hasMember(playerUUID)) {
             sender.sendMessage(localisation.get(LocalisationEntry.ERR_PLAYER_NOT_MEMBER, playername, town.getName()));
             return true;
         }
 
         // Check player isn't already a citizen of town (cannot be demoted)
-        if (town.getCitizens().contains(playername)) {
+        if (town.getCitizens().contains(playerUUID)) {
             sender.sendMessage(localisation.get(LocalisationEntry.ERR_PLAYER_ALREADY_CITIZEN, playername, town.getName()));
             return true;
         }
@@ -103,15 +115,15 @@ public class DemoteCommand extends STCommand {
         final String basePath = "Towns." + town.getName();
         final String leadersPath = basePath + ".Leaders";
         final List<String> leaders = plugin.getConfig().getStringList(leadersPath);
-        leaders.remove(playername);
+        leaders.remove(playerUUID.toString());
         plugin.getConfig().set(leadersPath, leaders);
-        plugin.getTown(town.getName()).getLeaders().remove(playername);
+        plugin.getTown(town.getName()).getLeaders().remove(playerUUID);
 
         final String citizensPath = basePath + ".Citizens";
         final List<String> citizens = plugin.getConfig().getStringList(citizensPath);
-        citizens.add(playername);
+        citizens.add(playerUUID.toString());
         plugin.getConfig().set(citizensPath, citizens);
-        plugin.getTown(town.getName()).getCitizens().add(playername);
+        plugin.getTown(town.getName()).getCitizens().add(playerUUID);
 
         // Log to file
         new Logger(plugin).log(localisation.get(LocalisationEntry.LOG_LEADER_DEMOTED, town.getName(), sender.getName(), playername));

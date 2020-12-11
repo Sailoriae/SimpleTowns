@@ -2,11 +2,15 @@ package com.gmail.jameshealey1994.simpletowns.utils;
 
 import com.gmail.jameshealey1994.simpletowns.object.Town;
 import com.gmail.jameshealey1994.simpletowns.object.TownChunk;
+import com.gmail.jameshealey1994.simpletowns.utils.PlayernameUUID;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Level;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.Plugin;
 
@@ -70,8 +74,56 @@ public class TownUtils {
 
         for (String townname : townKeys) {
             try {
-                final Set<String> leaders = new HashSet<>(plugin.getConfig().getStringList(PATH + "." + townname + ".Leaders"));
-                final Set<String> citizens = new HashSet<>(plugin.getConfig().getStringList(PATH + "." + townname + ".Citizens"));
+                UUID playerUUID;
+                boolean hasUUIDconversion = false;
+
+                final Set<UUID> leaders = new HashSet<>();
+                final ArrayList<String> unknownLeaders = new ArrayList<>(); // Only for UUID conversion
+                for (String player: plugin.getConfig().getStringList(PATH + "." + townname + ".Leaders")) {
+                    try {
+                        leaders.add(UUID.fromString(player));
+                    } catch (IllegalArgumentException e) {
+                        playerUUID = PlayernameUUID.getPlayerUUID(player);
+                        if (playerUUID != null) leaders.add(playerUUID);
+                        else unknownLeaders.add(player);
+                        hasUUIDconversion = true;
+                    }
+                }
+
+                // Save UUID conversion
+                if (hasUUIDconversion) {
+                    final String path = "Towns." + townname + ".Leaders";
+                    for (UUID leader : leaders){
+                        unknownLeaders.add(leader.toString()); // Now contains unconverted to UUID and converted to UUID leaders
+                    }
+                    plugin.getConfig().set(path, unknownLeaders);
+                }
+
+                hasUUIDconversion = false;
+
+                final Set<UUID> citizens = new HashSet<>();
+                final ArrayList<String> unknownCitizens = new ArrayList<>(); // Only for UUID conversion
+                for (String player: plugin.getConfig().getStringList(PATH + "." + townname + ".Citizens")) {
+                    try {
+                        citizens.add(UUID.fromString(player));
+                    } catch (IllegalArgumentException e) {
+                        playerUUID = PlayernameUUID.getPlayerUUID(player);
+                        if (playerUUID != null) citizens.add(playerUUID);
+                        else unknownCitizens.add(player);
+                        hasUUIDconversion = true;
+                    }
+                }
+
+                // Save UUID conversion
+                if (hasUUIDconversion) {
+                    final String path = "Towns." + townname + ".Citizens";
+                    for (UUID citizen : citizens){
+                        unknownCitizens.add(citizen.toString()); // Now contains unconverted to UUID and converted to UUID citizens
+                    }
+                    plugin.getConfig().set(path, unknownCitizens);
+                }
+
+
                 final Set<String> chunkWorlds = new HashSet<>(plugin.getConfig().getConfigurationSection(PATH + "." + townname + ".Chunks").getKeys(false));
                 final Set<TownChunk> chunks = new HashSet<>();
                 for (String world : chunkWorlds) {

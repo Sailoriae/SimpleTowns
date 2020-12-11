@@ -47,9 +47,12 @@ public class DeleteCommand extends STCommand {
         }
 
         // Check player is town leader or admin
-        if (sender instanceof Player && !town.getLeaders().contains(sender.getName()) && !sender.hasPermission(STPermission.ADMIN.getPermission())) {
-            sender.sendMessage(localisation.get(LocalisationEntry.ERR_NOT_LEADER, attemptedTownName));
-            return true;
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
+            if (!town.getLeaders().contains(player.getUniqueId()) && !sender.hasPermission(STPermission.ADMIN.getPermission())) {
+                sender.sendMessage(localisation.get(LocalisationEntry.ERR_NOT_LEADER, attemptedTownName));
+                return true;
+            }
         }
 
         //Create and call TownDeleteEvent

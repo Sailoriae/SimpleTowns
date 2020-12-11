@@ -10,7 +10,9 @@ import com.gmail.jameshealey1994.simpletowns.permissions.STPermission;
 import com.gmail.jameshealey1994.simpletowns.utils.Logger;
 import com.gmail.jameshealey1994.simpletowns.utils.NameValidityChecker;
 import com.gmail.jameshealey1994.simpletowns.utils.TownUtils;
+import com.gmail.jameshealey1994.simpletowns.utils.PlayernameUUID;
 import java.util.Arrays;
+import java.util.UUID;
 import org.bukkit.Chunk;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -82,6 +84,13 @@ public class CreateCommand extends STCommand {
             return true;
         }
 
+        // Validate leader UUID
+        UUID leaderUUID = PlayernameUUID.getPlayerUUID( leadername );
+        if (leaderUUID == null) {
+            sender.sendMessage(localisation.get(LocalisationEntry.ERR_CANNOT_FIND_PLAYER_UUID, leadername));
+            return true;
+        }
+
         // Check town doesn't already exist
         if (plugin.getTown(townname) != null) {
             sender.sendMessage(localisation.get(LocalisationEntry.ERR_TOWN_ALREADY_EXISTS, townname));
@@ -114,7 +123,7 @@ public class CreateCommand extends STCommand {
 
         // Create town
         final String path = "Towns.";
-        plugin.getConfig().set(path + townname + ".Leaders", Arrays.asList(leadername));
+        plugin.getConfig().set(path + townname + ".Leaders", Arrays.asList(leaderUUID.toString()));
 
         // Log to file
         final Logger logger = new Logger(plugin);
@@ -123,7 +132,7 @@ public class CreateCommand extends STCommand {
 
         // Add first chunk to town
         plugin.getConfig().set(path + townname + ".Chunks." + worldname, Arrays.asList(chunkX + "," + chunkZ));
-        plugin.getTowns().put(townname.toLowerCase(), new Town(townname, leadername, townchunk));
+        plugin.getTowns().put(townname.toLowerCase(), new Town(townname, leaderUUID, townchunk));
 
         // Log to file
         logger.log(localisation.get(LocalisationEntry.LOG_CHUNK_CLAIMED, townname, player.getName(), worldname, chunkX, chunkZ));

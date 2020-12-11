@@ -3,6 +3,7 @@ package com.gmail.jameshealey1994.simpletowns.object;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Class representing a Town.
@@ -20,13 +21,13 @@ public class Town {
      * The usernames of the leaders of the Town.
      * A Player should only be a citizen or a leader, not both.
      */
-    private Set<String> leaders = new HashSet<>();
+    private Set<UUID> leaders = new HashSet<>();
 
     /**
      * The usernames of the citizens of the Town.
      * A Player should only be a citizen or a leader, not both.
      */
-    private Set<String> citizens = new HashSet<>();
+    private Set<UUID> citizens = new HashSet<>();
 
     /**
      * The TownChunks belonging to the Town.
@@ -44,7 +45,7 @@ public class Town {
      * @param chunk         the first chunk in the town, normally the chunk that
      *                      the creator is standing in when creating the town
      */
-    public Town(String name, String creator, TownChunk chunk) {
+    public Town(String name, UUID creator, TownChunk chunk) {
         this.name = name;
         this.leaders.add(creator);
         this.chunks.add(chunk);
@@ -58,7 +59,7 @@ public class Town {
      * @param citizens      the citizens of the Town
      * @param chunks        the TownChunks of the Town
      */
-    public Town(String name, Set<String> leaders, Set<String> citizens, Set<TownChunk> chunks) {
+    public Town(String name, Set<UUID> leaders, Set<UUID> citizens, Set<TownChunk> chunks) {
         this.name = name;
         this.leaders = leaders;
         this.citizens = citizens;
@@ -88,7 +89,7 @@ public class Town {
      *
      * @return      the usernames of the leaders of the Town
      */
-    public Set<String> getLeaders() {
+    public Set<UUID> getLeaders() {
         return leaders;
     }
 
@@ -97,7 +98,7 @@ public class Town {
      *
      * @param leaders       the new usernames of the leaders of the Town
      */
-    public void setLeaders(Set<String> leaders) {
+    public void setLeaders(Set<UUID> leaders) {
         this.leaders = leaders;
     }
 
@@ -107,7 +108,7 @@ public class Town {
      *
      * @return      the usernames of the citizens of the Town
      */
-    public Set<String> getCitizens() {
+    public Set<UUID> getCitizens() {
         return citizens;
     }
 
@@ -116,7 +117,7 @@ public class Town {
      *
      * @param citizens      the new usernames of the citizens of the Town
      */
-    public void setCitizens(Set<String> citizens) {
+    public void setCitizens(Set<UUID> citizens) {
         this.citizens = citizens;
     }
 
@@ -142,11 +143,11 @@ public class Town {
      * Returns if the passed Player is a member of the Town.
      * Members can be citizens or leaders
      *
-     * @param playername        name of player to be checked
+     * @param playerUUID        UUID of player to be checked
      * @return                  if the passed Player is a member of the Town
      */
-    public boolean hasMember(String playername) {
-        return (getCitizens().contains(playername) || getLeaders().contains(playername));
+    public boolean hasMember(UUID playerUUID) {
+        return (getCitizens().contains(playerUUID) || getLeaders().contains(playerUUID));
     }
 
     @Override

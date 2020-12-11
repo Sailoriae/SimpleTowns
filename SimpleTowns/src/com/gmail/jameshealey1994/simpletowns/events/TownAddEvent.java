@@ -5,6 +5,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import java.util.UUID;
 
 /**
  * Town Add Event.
@@ -36,6 +37,11 @@ public class TownAddEvent extends Event implements Cancellable {
     private final String addedName;
 
     /**
+     * The UUID of the player about to be added to the town.
+     */
+    private final UUID addedUUID;
+
+    /**
      * If the event is cancelled.
      */
     private boolean cancelled = false;
@@ -46,11 +52,13 @@ public class TownAddEvent extends Event implements Cancellable {
      * @param town          town the player is about to be added to
      * @param sender        sender of the command to add the player
      * @param addedName     name of the player about to be added to the town
+     * @param addedUUID     UUID of the player about to be added to the town
      */
-    public TownAddEvent(Town town, CommandSender sender, String addedName) {
+    public TownAddEvent(Town town, CommandSender sender, String addedName, UUID addedUUID) {
         this.town = town;
         this.sender = sender;
         this.addedName = addedName;
+        this.addedUUID = addedUUID;
     }
 
     /**

@@ -348,7 +348,7 @@ public class STListener implements Listener {
                 return player.hasPermission(STPermission.BUILD_WILDERNESS.getPermission());
             }
         } else {
-            return town.hasMember(player.getName()) && player.hasPermission(STPermission.BUILD_TOWNS.getPermission());
+            return town.hasMember(player.getUniqueId()) && player.hasPermission(STPermission.BUILD_TOWNS.getPermission());
         }
     }
 }

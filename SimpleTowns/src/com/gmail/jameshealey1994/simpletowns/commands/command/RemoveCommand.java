@@ -7,7 +7,9 @@ import com.gmail.jameshealey1994.simpletowns.localisation.LocalisationEntry;
 import com.gmail.jameshealey1994.simpletowns.object.Town;
 import com.gmail.jameshealey1994.simpletowns.permissions.STPermission;
 import com.gmail.jameshealey1994.simpletowns.utils.Logger;
+import com.gmail.jameshealey1994.simpletowns.utils.PlayernameUUID;
 import java.util.List;
+import java.util.UUID;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -81,19 +83,29 @@ public class RemoveCommand extends STCommand {
         }
 
         // Check sender is a leader of that town.
-        if ((sender instanceof Player) && !(town.getLeaders().contains(sender.getName())) && !sender.hasPermission(STPermission.ADMIN.getPermission())) {
-            sender.sendMessage(localisation.get(LocalisationEntry.ERR_NOT_LEADER, town.getName()));
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
+            if (!town.getLeaders().contains(player.getUniqueId()) && !sender.hasPermission(STPermission.ADMIN.getPermission())) {
+                sender.sendMessage(localisation.get(LocalisationEntry.ERR_NOT_LEADER, town.getName()));
+                return true;
+            }
+        }
+
+        // Validate playername UUID
+        UUID playerUUID = PlayernameUUID.getPlayerUUID( playername );
+        if (playerUUID == null) {
+            sender.sendMessage(localisation.get(LocalisationEntry.ERR_CANNOT_FIND_PLAYER_UUID, playername));
             return true;
         }
 
         // Check player is a member of town (citizen or leader)
-        if (!town.hasMember(playername)) {
+        if (!town.hasMember(playerUUID)) {
             sender.sendMessage(localisation.get(LocalisationEntry.ERR_PLAYER_NOT_MEMBER, playername, town.getName()));
             return true;
         }
 
         //Create and call event
-        final TownRemoveEvent event = new TownRemoveEvent(town, sender, playername);
+        final TownRemoveEvent event = new TownRemoveEvent(town, sender, playername, playerUUID);
         plugin.getServer().getPluginManager().callEvent(event);
 
         // Check event has not been cancelled by event listeners
@@ -104,16 +116,16 @@ public class RemoveCommand extends STCommand {
         // Remove member from town if citizen
         final String citizensPath = "Towns." + town.getName() + ".Citizens";
         final List<String> citizens = plugin.getConfig().getStringList(citizensPath);
-        citizens.remove(playername);
+        citizens.remove(playerUUID.toString());
         plugin.getConfig().set(citizensPath, citizens);
-        plugin.getTown(town.getName()).getCitizens().remove(playername);
+        plugin.getTown(town.getName()).getCitizens().remove(playerUUID);
 
         // Remove member from town if leader
         final String leadersPath = "Towns." + town.getName() + ".Leaders";
         final List<String> leaders = plugin.getConfig().getStringList(leadersPath);
-        leaders.remove(playername);
+        leaders.remove(playerUUID.toString());
         plugin.getConfig().set(leadersPath, leaders);
-        plugin.getTown(town.getName()).getLeaders().remove(playername);
+        plugin.getTown(town.getName()).getLeaders().remove(playerUUID);
 
         // Log to file
         new Logger(plugin).log(localisation.get(LocalisationEntry.LOG_TOWN_MEMBER_REMOVED, town.getName(), sender.getName(), playername));

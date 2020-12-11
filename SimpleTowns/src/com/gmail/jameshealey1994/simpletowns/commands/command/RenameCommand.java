@@ -86,9 +86,12 @@ public class RenameCommand extends STCommand {
         }
 
         // Check sender is a leader of that town.
-        if ((sender instanceof Player) && (!(town.getLeaders().contains(sender.getName()))) && !sender.hasPermission(STPermission.ADMIN.getPermission())) {
-            sender.sendMessage(localisation.get(LocalisationEntry.ERR_NOT_LEADER, town.getName()));
-            return true;
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
+            if (!(town.getLeaders().contains(player.getUniqueId())) && !sender.hasPermission(STPermission.ADMIN.getPermission())) {
+                sender.sendMessage(localisation.get(LocalisationEntry.ERR_NOT_LEADER, town.getName()));
+                return true;
+            }
         }
 
         // Check a town with the new name doesn't already exist

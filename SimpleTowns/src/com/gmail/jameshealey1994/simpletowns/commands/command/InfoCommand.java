@@ -5,8 +5,10 @@ import com.gmail.jameshealey1994.simpletowns.localisation.Localisation;
 import com.gmail.jameshealey1994.simpletowns.localisation.LocalisationEntry;
 import com.gmail.jameshealey1994.simpletowns.object.Town;
 import com.gmail.jameshealey1994.simpletowns.permissions.STPermission;
+import com.gmail.jameshealey1994.simpletowns.utils.PlayernameUUID;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import java.util.UUID;
 
 /**
  * Class representing an Info command.
@@ -59,16 +61,21 @@ public class InfoCommand extends STCommand {
         // Display town information
         // TODO paginate - see ChatPaginator bukkit utility class
         sender.sendMessage(localisation.get(LocalisationEntry.INFO_HEADER, town.getName()));
+        String playername;
         if (!(town.getLeaders().isEmpty())) {
             sender.sendMessage(localisation.get(LocalisationEntry.INFO_TOWN_LEADERS_HEADER));
-            for (String s : town.getLeaders()) {
-                sender.sendMessage(localisation.get(LocalisationEntry.INFO_TOWN_LEADERS_ENTRY, s));
+            for (UUID uuid : town.getLeaders()) {
+                playername = PlayernameUUID.getPlayerName(uuid);
+                if (playername == null) playername = "? (" + uuid.toString() + ")";
+                sender.sendMessage(localisation.get(LocalisationEntry.INFO_TOWN_LEADERS_ENTRY, playername));
             }
         }
         if (!(town.getCitizens().isEmpty())) {
             sender.sendMessage(localisation.get(LocalisationEntry.INFO_TOWN_CITIZENS_HEADER));
-            for (String s : town.getCitizens()) {
-                sender.sendMessage(localisation.get(LocalisationEntry.INFO_TOWN_CITIZENS_ENTRY, s));
+            for (UUID uuid : town.getCitizens()) {
+                playername = PlayernameUUID.getPlayerName(uuid);
+                if (playername == null) playername = "? (" + uuid.toString() + ")";
+                sender.sendMessage(localisation.get(LocalisationEntry.INFO_TOWN_CITIZENS_ENTRY, playername));
             }
         }
         sender.sendMessage(localisation.get(LocalisationEntry.INFO_TOWN_CHUNKS, town.getTownChunks().size()));

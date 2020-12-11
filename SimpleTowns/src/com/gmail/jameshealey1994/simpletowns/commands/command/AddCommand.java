@@ -8,7 +8,9 @@ import com.gmail.jameshealey1994.simpletowns.object.Town;
 import com.gmail.jameshealey1994.simpletowns.permissions.STPermission;
 import com.gmail.jameshealey1994.simpletowns.utils.Logger;
 import com.gmail.jameshealey1994.simpletowns.utils.NameValidityChecker;
+import com.gmail.jameshealey1994.simpletowns.utils.PlayernameUUID;
 import java.util.List;
+import java.util.UUID;
 import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -84,9 +86,12 @@ public class AddCommand extends STCommand {
         }
 
         // Check sender is a leader of that town.
-        if ((sender instanceof Player) && (!(town.getLeaders().contains(sender.getName()))) && !sender.hasPermission(STPermission.ADMIN.getPermission())) {
-            sender.sendMessage(localisation.get(LocalisationEntry.ERR_NOT_LEADER, town.getName()));
-            return true;
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
+            if (!town.getLeaders().contains(player.getUniqueId()) && !sender.hasPermission(STPermission.ADMIN.getPermission())) {
+                sender.sendMessage(localisation.get(LocalisationEntry.ERR_NOT_LEADER, town.getName()));
+                return true;
+            }
         }
 
         // Validate player name
@@ -98,14 +103,21 @@ public class AddCommand extends STCommand {
         // Get player's full name
         final String fullPlayerName = getFullName(plugin.getServer(), playername);
 
+        // Validate playername UUID
+        UUID playerUUID = PlayernameUUID.getPlayerUUID( fullPlayerName );
+        if (playerUUID == null) {
+            sender.sendMessage(localisation.get(LocalisationEntry.ERR_CANNOT_FIND_PLAYER_UUID, fullPlayerName));
+            return true;
+        }
+
         // Check player isn't already a member of town (citizen or leader)
-        if (town.hasMember(fullPlayerName)) {
+        if (town.hasMember(playerUUID)) {
             sender.sendMessage(localisation.get(LocalisationEntry.ERR_PLAYER_ALREADY_MEMBER, fullPlayerName, town.getName()));
             return true;
         }
 
         //Create and call event
-        final TownAddEvent event = new TownAddEvent(town, sender, fullPlayerName);
+        final TownAddEvent event = new TownAddEvent(town, sender, fullPlayerName, playerUUID);
         plugin.getServer().getPluginManager().callEvent(event);
 
         // Check event has not been cancelled by event listeners
@@ -114,12 +126,12 @@ public class AddCommand extends STCommand {
         }
 
         // Add citizen to town locally
-        town.getCitizens().add(fullPlayerName);
+        town.getCitizens().add(playerUUID);
 
         // Add citizen to town in config
         final String path = "Towns." + town.getName() + ".Citizens";
         final List<String> citizens = plugin.getConfig().getStringList(path);
-        citizens.add(fullPlayerName);
+        citizens.add(playerUUID.toString());
         plugin.getConfig().set(path, citizens);
 
         // Log to file
