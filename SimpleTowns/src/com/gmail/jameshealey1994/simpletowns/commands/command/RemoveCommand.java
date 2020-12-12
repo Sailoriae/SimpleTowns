@@ -92,10 +92,15 @@ public class RemoveCommand extends STCommand {
         }
 
         // Validate playername UUID
-        UUID playerUUID = PlayernameUUID.getPlayerUUID( playername );
-        if (playerUUID == null) {
-            sender.sendMessage(localisation.get(LocalisationEntry.ERR_CANNOT_FIND_PLAYER_UUID, playername));
-            return true;
+        UUID playerUUID;
+        try {
+            playerUUID = UUID.fromString( playername ); // Can give UUID instead of playername in order to remove "ghosts" members
+        } catch (IllegalArgumentException e) {
+            playerUUID = PlayernameUUID.getPlayerUUID( playername );
+            if (playerUUID == null) {
+                sender.sendMessage(localisation.get(LocalisationEntry.ERR_CANNOT_FIND_PLAYER_UUID, playername));
+                return true;
+            }
         }
 
         // Check player is a member of town (citizen or leader)
