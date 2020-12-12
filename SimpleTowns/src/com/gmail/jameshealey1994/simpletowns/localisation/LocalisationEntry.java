@@ -761,6 +761,14 @@ public enum LocalisationEntry {
             "&7------ Town Info - %1$s ------"),
 
     /**
+     * Displayed at the top of the Info command.
+     */
+    INFO_FOOTER (
+            "InfoFooter",
+            null,
+            "&7------"),
+
+    /**
      * Displayed above a list of leaders of the town in the Info command.
      */
     INFO_TOWN_LEADERS_HEADER (
@@ -823,6 +831,14 @@ public enum LocalisationEntry {
             "HelpHeader",
             "%1$s - plugin description",
             "&7------ %1$s ------"),
+
+    /**
+     * Displayed at the bottom of the Help command.
+     */
+    HELP_FOOTER (
+            "HelpFooter",
+            null,
+            "&7------"),
 
     /**
      * Displayed for each command in the help command.

@@ -93,6 +93,7 @@ public class InfoCommand extends STCommand {
                 sender.sendMessage(localisation.get(LocalisationEntry.INFO_TOWN_CITIZENS_ENTRY, ghosts));
         }
         sender.sendMessage(localisation.get(LocalisationEntry.INFO_TOWN_CHUNKS, town.getTownChunks().size()));
+        sender.sendMessage(localisation.get(LocalisationEntry.INFO_FOOTER));
         return true;
     }
 

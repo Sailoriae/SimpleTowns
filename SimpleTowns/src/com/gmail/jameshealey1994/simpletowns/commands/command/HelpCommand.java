@@ -33,6 +33,7 @@ public class HelpCommand extends STCommand {
                 sender.sendMessage(localisation.get(LocalisationEntry.HELP_ENTRY, command.aliases.get(0), command.getDescription(localisation)));
             }
         }
+        sender.sendMessage(localisation.get(LocalisationEntry.HELP_FOOTER));
         return true;
     }
 
