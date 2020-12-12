@@ -9,6 +9,8 @@ import com.gmail.jameshealey1994.simpletowns.utils.PlayernameUUID;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import java.util.UUID;
+import java.util.ArrayList;
+import java.util.StringJoiner;
 
 /**
  * Class representing an Info command.
@@ -63,20 +65,32 @@ public class InfoCommand extends STCommand {
         sender.sendMessage(localisation.get(LocalisationEntry.INFO_HEADER, town.getName()));
         String playername;
         if (!(town.getLeaders().isEmpty())) {
-            sender.sendMessage(localisation.get(LocalisationEntry.INFO_TOWN_LEADERS_HEADER));
+            StringJoiner toSend = new StringJoiner(", ");
+            ArrayList<String> ghosts = new ArrayList<>(); // Display at the end players whose UUID couldn't be converted to names
             for (UUID uuid : town.getLeaders()) {
                 playername = PlayernameUUID.getPlayerName(uuid);
-                if (playername == null) playername = "? (" + uuid.toString() + ")";
-                sender.sendMessage(localisation.get(LocalisationEntry.INFO_TOWN_LEADERS_ENTRY, playername));
+                if (playername != null) {
+                    toSend.add(playername);
+                } else 
+                    ghosts.add( uuid.toString() );
             }
+            sender.sendMessage(localisation.get(LocalisationEntry.INFO_TOWN_LEADERS_HEADER) + " " + toSend.toString());
+            for (String uuid : ghosts)
+                sender.sendMessage(localisation.get(LocalisationEntry.INFO_TOWN_LEADERS_ENTRY, ghosts));
         }
         if (!(town.getCitizens().isEmpty())) {
-            sender.sendMessage(localisation.get(LocalisationEntry.INFO_TOWN_CITIZENS_HEADER));
+            StringJoiner toSend = new StringJoiner(", ");
+            ArrayList<String> ghosts = new ArrayList<>(); // Display at the end players whose UUID couldn't be converted to names
             for (UUID uuid : town.getCitizens()) {
                 playername = PlayernameUUID.getPlayerName(uuid);
-                if (playername == null) playername = "? (" + uuid.toString() + ")";
-                sender.sendMessage(localisation.get(LocalisationEntry.INFO_TOWN_CITIZENS_ENTRY, playername));
+                if (playername != null) {
+                    toSend.add(playername);
+                } else 
+                    ghosts.add( uuid.toString() );
             }
+            sender.sendMessage(localisation.get(LocalisationEntry.INFO_TOWN_CITIZENS_HEADER) + " " + toSend.toString());
+            for (String uuid : ghosts)
+                sender.sendMessage(localisation.get(LocalisationEntry.INFO_TOWN_CITIZENS_ENTRY, ghosts));
         }
         sender.sendMessage(localisation.get(LocalisationEntry.INFO_TOWN_CHUNKS, town.getTownChunks().size()));
         return true;

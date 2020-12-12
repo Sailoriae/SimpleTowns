@@ -766,7 +766,7 @@ public enum LocalisationEntry {
     INFO_TOWN_LEADERS_HEADER (
             "InfoTownLeadersHeader",
             null,
-            "&dTown Leaders"),
+            "&dTown Leaders:"),
 
     /**
      * Displayed for each leader in a Town in the Info command.
@@ -783,7 +783,7 @@ public enum LocalisationEntry {
     INFO_TOWN_CITIZENS_HEADER (
             "InfoTownCitizensHeader",
             null,
-            "&dTown Citizens"),
+            "&dTown Citizens:"),
 
     /**
      * Displayed for each citizen in a Town in the Info command.
