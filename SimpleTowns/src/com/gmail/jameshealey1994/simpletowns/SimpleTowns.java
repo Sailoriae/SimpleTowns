@@ -8,13 +8,18 @@ import com.gmail.jameshealey1994.simpletowns.commands.command.STCommand;
 import com.gmail.jameshealey1994.simpletowns.listeners.STListener;
 import com.gmail.jameshealey1994.simpletowns.localisation.Localisable;
 import com.gmail.jameshealey1994.simpletowns.localisation.Localisation;
+import com.gmail.jameshealey1994.simpletowns.localisation.LocalisationEntry;
 import com.gmail.jameshealey1994.simpletowns.object.Town;
 import com.gmail.jameshealey1994.simpletowns.object.TownChunk;
 import com.gmail.jameshealey1994.simpletowns.utils.TownUtils;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.dynmap.DynmapAPI;
+import org.dynmap.markers.MarkerSet;
 
 /**
  * Simple, chunk-based protection plugin for Bukkit.
@@ -40,11 +45,29 @@ public class SimpleTowns extends JavaPlugin implements Localisable {
      */
     private Map<String, Town> towns = new HashMap<>();
 
+    /**
+     * Our Dynmap marketset (Or null).
+     */
+    private MarkerSet markerset = null;
+
     @Override
     public void onEnable() {
 
         // Save a copy of the default config.yml if one is not there
         saveDefaultConfig();
+
+        // Get Dynmap API (Or null)
+        DynmapAPI dynmap = (DynmapAPI) Bukkit.getServer().getPluginManager().getPlugin("dynmap");
+
+        // Create Dynmap markerset if it doesn't exists
+        if (dynmap != null) {
+            this.getLogger().log(Level.INFO, "Hooked into Dynmap");
+            this.markerset = dynmap.getMarkerAPI().getMarkerSet("simpletowns.markerset");
+            if (this.markerset == null) {
+                this.markerset = dynmap.getMarkerAPI().createMarkerSet("simpletowns.markerset", this.localisation.get(LocalisationEntry.DYNMAP_LAYER), null, false);
+                this.markerset.setHideByDefault(false);
+            }
+        }
 
         // Load towns from config
         this.towns = new TownUtils(this).getTownsFromConfig();
@@ -54,6 +77,13 @@ public class SimpleTowns extends JavaPlugin implements Localisable {
 
         // Set command executors and default command
         getCommand("towns").setExecutor(new STCommandExecutor(this, new HelpCommand()));
+    }
+
+    @Override
+    public void onDisable() {
+        // Delete our Dynmap markerset (Like Dynmap-WorldGuard plugin)
+        if (this.markerset != null)
+            this.markerset.deleteMarkerSet();
     }
 
     /**
@@ -140,5 +170,14 @@ public class SimpleTowns extends JavaPlugin implements Localisable {
             }
         }
         return null;
+    }
+
+    /**
+     * Returns our Dynmap markerset if this plugin is installed.
+     *
+     * @return      MarkerSet or null
+     */
+    public MarkerSet getMarketset() {
+        return markerset;
     }
 }

@@ -7,6 +7,8 @@ version: ${project.version}
 
 api-version: ${spigot.api.version}
 
+softdepend: [ dynmap ]
+
 commands:
     towns:
         aliases: [town, simpletown, simpletowns]

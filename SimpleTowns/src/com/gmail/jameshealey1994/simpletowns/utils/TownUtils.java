@@ -1,8 +1,10 @@
 package com.gmail.jameshealey1994.simpletowns.utils;
 
+import com.gmail.jameshealey1994.simpletowns.SimpleTowns;
 import com.gmail.jameshealey1994.simpletowns.object.Town;
 import com.gmail.jameshealey1994.simpletowns.object.TownChunk;
 import com.gmail.jameshealey1994.simpletowns.utils.PlayernameUUID;
+import com.gmail.jameshealey1994.simpletowns.utils.DynmapUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,7 +14,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.plugin.Plugin;
+import org.dynmap.markers.AreaMarker;
 
 /**
  * Utility methods that interact with a configuration file for town values.
@@ -29,14 +31,14 @@ public class TownUtils {
     /**
      * Plugin with associated config file.
      */
-    private final Plugin plugin;
+    private final SimpleTowns plugin;
 
     /**
      * Constructor - Sets plugin.
      *
      * @param plugin    plugin with config and logger
      */
-    public TownUtils(Plugin plugin) {
+    public TownUtils(SimpleTowns plugin) {
         this.plugin = plugin;
     }
 
@@ -71,6 +73,8 @@ public class TownUtils {
         final ConfigurationSection townConfigSection = new ConfigUtils(plugin).getConfigSection(PATH);
         final Map<String, Town> townsFromConfig = new HashMap<>();
         final Set<String> townKeys = new HashSet<>(townConfigSection.getKeys(false));
+
+        final DynmapUtils dynmap = new DynmapUtils(plugin);
 
         for (String townname : townKeys) {
             try {
@@ -133,6 +137,9 @@ public class TownUtils {
                         final int chunkZ = Integer.parseInt(chunk.substring(chunk.indexOf(',') + 1));
                         final TownChunk townchunk = new TownChunk(chunkX, chunkZ, world);
                         chunks.add(townchunk);
+
+                        // Add the chunk to our Dynmap markerset
+                        dynmap.addMarkersetChunk(townname, world, chunkX, chunkZ);
                     }
                 }
                 final Town town = new Town(townname, leaders, citizens, chunks);

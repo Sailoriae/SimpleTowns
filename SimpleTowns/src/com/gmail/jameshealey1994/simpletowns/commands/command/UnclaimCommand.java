@@ -8,6 +8,7 @@ import com.gmail.jameshealey1994.simpletowns.object.Town;
 import com.gmail.jameshealey1994.simpletowns.object.TownChunk;
 import com.gmail.jameshealey1994.simpletowns.permissions.STPermission;
 import com.gmail.jameshealey1994.simpletowns.utils.Logger;
+import com.gmail.jameshealey1994.simpletowns.utils.DynmapUtils;
 import java.util.List;
 import org.bukkit.Chunk;
 import org.bukkit.command.CommandSender;
@@ -81,6 +82,10 @@ public class UnclaimCommand extends STCommand {
         // Remove chunk from local town
         final TownChunk townchunk = new TownChunk(chunk);
         town.getTownChunks().remove(townchunk);
+
+        // Remove chunk from our Dynmap markerset
+        if (plugin.getMarketset() != null)
+            new DynmapUtils(plugin).removeMarkersetChunk(worldname, chunkX, chunkZ);
 
         // Log to file
         new Logger(plugin).log(localisation.get(LocalisationEntry.LOG_CHUNK_UNCLAIMED, town.getName(), sender.getName(), worldname, chunkX, chunkZ));

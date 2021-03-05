@@ -9,6 +9,14 @@ package com.gmail.jameshealey1994.simpletowns.localisation;
 public enum LocalisationEntry {
 
     /**
+     * Name of the Dynmap layer
+     */
+    DYNMAP_LAYER (
+            "DynmapLayer",
+            null,
+            "Towns"),
+
+    /**
      * Message telling player they do not have permission to use a command.
      */
     ERR_PERMISSION_DENIED (
