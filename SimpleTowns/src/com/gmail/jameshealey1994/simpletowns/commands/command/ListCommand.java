@@ -6,6 +6,7 @@ import com.gmail.jameshealey1994.simpletowns.localisation.LocalisationEntry;
 import com.gmail.jameshealey1994.simpletowns.object.Town;
 import com.gmail.jameshealey1994.simpletowns.permissions.STPermission;
 import org.bukkit.command.CommandSender;
+import java.util.StringJoiner;
 
 /**
  * Class representing a list command.
@@ -35,11 +36,11 @@ public class ListCommand extends STCommand {
             return true;
         }
 
-        sender.sendMessage(localisation.get(LocalisationEntry.LIST_HEADER));
+        StringJoiner toSend = new StringJoiner(", ");
         for (Town t : plugin.getTowns().values()) {
-            sender.sendMessage(localisation.get(LocalisationEntry.LIST_ENTRY, t.getName()));
-            // TODO pages?
+            toSend.add(t.getName());
         }
+        sender.sendMessage(localisation.get(LocalisationEntry.LIST_HEADER) + " " + toSend.toString());
         return true;
     }
 

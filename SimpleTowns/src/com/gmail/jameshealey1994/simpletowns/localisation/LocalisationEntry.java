@@ -739,16 +739,7 @@ public enum LocalisationEntry {
     LIST_HEADER (
             "ListHeader",
             null,
-            "&7------ Towns ------"),
-
-    /**
-     * Displayed at for each town with the List command.
-     * %1$s - town name
-     */
-    LIST_ENTRY (
-            "ListEntry",
-            "%1$s - town name",
-            "&7%1$s"),
+            "&6Towns:"),
 
     /**
      * Message displayed to the user if List command is performed but no towns
