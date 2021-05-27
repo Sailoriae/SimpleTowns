@@ -139,11 +139,19 @@ public class TownUtils {
                         chunks.add(townchunk);
 
                         // Add the chunk to our Dynmap markerset
-                        dynmap.addMarkersetChunk(townname, world, chunkX, chunkZ);
+//                        dynmap.addMarkersetChunk(townname, world, chunkX, chunkZ);
                     }
                 }
                 final Town town = new Town(townname, leaders, citizens, chunks);
                 townsFromConfig.put(townname.toLowerCase(), town);
+
+                // This merge continuous chunks into areas
+                try {
+                    dynmap.optimizedAddMarkersetTown( town );
+                } catch (Exception ex) {
+                    plugin.getLogger().log(Level.WARNING, "{0} creating town areas {1} on Dynmap: {2}", new Object[] {ex.getClass().getName(), townname, ex.getMessage()});
+                }
+
             } catch (NumberFormatException | NullPointerException ex) {
                 plugin.getLogger().log(Level.WARNING, "{0} getting towns from config: {1}", new Object[] {ex.getClass().getName(), ex.getMessage()});
             }

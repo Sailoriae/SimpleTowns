@@ -94,7 +94,7 @@ public class ClaimCommand extends STCommand {
 
         // Add chunk to our Dynmap markerset
         if (plugin.getMarketset() != null)
-            new DynmapUtils(plugin).addMarkersetChunk(town.getName(), worldname, chunkX, chunkZ);
+            new DynmapUtils(plugin).addMarkersetChunk(town, townchunk);
 
         // Log to file
         new Logger(plugin).log(localisation.get(LocalisationEntry.LOG_CHUNK_CLAIMED, town.getName(), sender.getName(), worldname, chunkX, chunkZ));

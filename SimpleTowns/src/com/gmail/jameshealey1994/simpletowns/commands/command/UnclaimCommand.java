@@ -85,7 +85,7 @@ public class UnclaimCommand extends STCommand {
 
         // Remove chunk from our Dynmap markerset
         if (plugin.getMarketset() != null)
-            new DynmapUtils(plugin).removeMarkersetChunk(worldname, chunkX, chunkZ);
+            new DynmapUtils(plugin).removeMarkersetChunk(town, townchunk);
 
         // Log to file
         new Logger(plugin).log(localisation.get(LocalisationEntry.LOG_CHUNK_UNCLAIMED, town.getName(), sender.getName(), worldname, chunkX, chunkZ));
