@@ -64,6 +64,10 @@ public class DeleteCommand extends STCommand {
             return true;
         }
 
+        // Remove chunks from our Dynmap markerset
+        plugin.getDynmapUtils().removeFastMarkersetTown(town);
+        plugin.getDynmapUtils().removeOptimizedMarkersetTown(town);
+
         // Delete town locally
         plugin.getTowns().remove(town.getName().toLowerCase());
 

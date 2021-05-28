@@ -1,71 +1,120 @@
 package com.gmail.jameshealey1994.simpletowns.utils;
 
 import com.gmail.jameshealey1994.simpletowns.SimpleTowns;
+import com.gmail.jameshealey1994.simpletowns.localisation.LocalisationEntry;
 import com.gmail.jameshealey1994.simpletowns.object.Town;
 import com.gmail.jameshealey1994.simpletowns.object.TownChunk;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import org.bukkit.Bukkit;
+import org.dynmap.DynmapAPI;
+import org.dynmap.markers.MarkerSet;
 import org.dynmap.markers.AreaMarker;
 
 /**
  * Utility methods that interact with the Dynmap API.
+ * This class has to be instantiated ONCE by the plugin.
  */
 public class DynmapUtils {
 
     /**
-     * Plugin with associated config file.
+     * Our Dynmap markerset.
      */
-    private final SimpleTowns plugin;
+    private MarkerSet markerset;
 
     /**
-     * Constructor - Sets plugin.
-     *
-     * @param plugin    plugin with config and logger
+     * Create our Dynmap markerset if it doesn't exists.
+     * 
+     * @param plugin    plugin with localisation
+     * @return      true if Dynmap in install, false otherwise
      */
-    public DynmapUtils(SimpleTowns plugin) {
-        this.plugin = plugin;
+    public boolean checkDynmapAndCreateMarkerset( SimpleTowns plugin ) {
+        // Get Dynmap API (Or null)
+        DynmapAPI dynmap = (DynmapAPI) Bukkit.getServer().getPluginManager().getPlugin("dynmap");
+
+        // Check if Dynmap is installed
+        if (dynmap == null)
+            return false;
+        
+        // Create Dynmap markerset if it doesn't exists
+        this.markerset = dynmap.getMarkerAPI().getMarkerSet("simpletowns.markerset");
+        if (this.markerset == null) {
+            this.markerset = dynmap.getMarkerAPI().createMarkerSet("simpletowns.markerset", plugin.getLocalisation().get(LocalisationEntry.DYNMAP_LAYER), null, false);
+            this.markerset.setHideByDefault(false);
+        }
+        return true;
+    }
+
+    /**
+     * Delete our Dynmap markerset if it exists.
+     * Does nothing if Dynmap isn't installed.
+     */
+    public void deleteMarkerset() {
+        if (markerset == null) return;
+
+        markerset.deleteMarkerSet();
+        markerset = null;
     }
 
     /**
      * Add a chunk to our Dynmap marketset.
+     * Does nothing if Dynmap isn't installed.
      */
     public void addMarkersetChunk( Town town, TownChunk chunk ) {
-        if (plugin.getMarketset() != null) {
-            String markerID = chunk.getWorldname() + "_" + String.valueOf(chunk.getX()) + "_" + String.valueOf(chunk.getZ());
-            AreaMarker marker = plugin.getMarketset().findAreaMarker( markerID );
-            if (marker != null)
-                marker.deleteMarker();
-            double[] cornersX = {chunk.getX()*16, chunk.getX()*16+16};
-            double[] cornersZ = {chunk.getZ()*16, chunk.getZ()*16+16};
-            marker = plugin.getMarketset().createAreaMarker(markerID, town.getName(), false, chunk.getWorldname(), cornersX, cornersZ, false);
-            marker.setLineStyle(0, 0.0, 0xFFFFFF);
-            marker.setFillStyle(0.35, 0xFFFFFF);
-            marker.setLabel(town.getName());
-        }
+        if (markerset == null) return;
+
+        String markerID = chunk.getWorldname() + "_" + String.valueOf(chunk.getX()) + "_" + String.valueOf(chunk.getZ());
+        AreaMarker marker = markerset.findAreaMarker( markerID );
+        if (marker != null)
+            marker.deleteMarker();
+        double[] cornersX = {chunk.getX()*16, chunk.getX()*16+16};
+        double[] cornersZ = {chunk.getZ()*16, chunk.getZ()*16+16};
+        marker = markerset.createAreaMarker(markerID, town.getName(), false, chunk.getWorldname(), cornersX, cornersZ, false);
+        marker.setLineStyle(0, 0.0, 0xFFFFFF);
+        marker.setFillStyle(0.35, 0xFFFFFF);
+        marker.setLabel(town.getName());
     }
 
     /**
      * Remove a chunk from our Dynmap marketset.
+     * Does nothing if Dynmap isn't installed.
      */
     public void removeMarkersetChunk( Town town, TownChunk chunk ) {
-        if (plugin.getMarketset() != null) {
-            AreaMarker marker = plugin.getMarketset().findAreaMarker( chunk.getWorldname() + "_" + String.valueOf(chunk.getX()) + "_" + String.valueOf(chunk.getZ()) );
-            if (marker != null)
-                marker.deleteMarker();
-            else {
-                removeOptimizedMarkersetTown(town);
-                fastAddMarkersetTown(town); // The player will maybe remove other chunks, so we add all of them in a non-optimized way, but faster
-            }
+        if (markerset == null) return;
+
+        AreaMarker marker = markerset.findAreaMarker( chunk.getWorldname() + "_" + String.valueOf(chunk.getX()) + "_" + String.valueOf(chunk.getZ()) );
+        if (marker != null)
+            marker.deleteMarker();
+        else {
+            removeOptimizedMarkersetTown(town);
+            fastAddMarkersetTown(town); // The player will maybe remove other chunks, so we add all of them in a non-optimized way, but faster
         }
     }
 
     /**
-     * Add all chunks of a Town to our Dynmap marketset, withour merging chunks
+     * Add all chunks of a Town to our Dynmap marketset, without merging chunks.
+     * Does nothing if Dynmap isn't installed.
      */
     private void fastAddMarkersetTown( final Town town ) {
+        if (markerset == null) return;
+
         for (TownChunk chunk : town.getTownChunks()) {
             addMarkersetChunk( town, chunk );
+        }
+    }
+
+    /**
+     * Remove all non-merged chunks of a Town from our Dynmap marketset.
+     * Does nothing if Dynmap isn't installed.
+     */
+    public void removeFastMarkersetTown( final Town town ) {
+        if (markerset == null) return;
+
+        for (TownChunk chunk : town.getTownChunks()) {
+            AreaMarker marker = markerset.findAreaMarker( chunk.getWorldname() + "_" + String.valueOf(chunk.getX()) + "_" + String.valueOf(chunk.getZ()) );
+            if (marker != null)
+                marker.deleteMarker();
         }
     }
 
@@ -128,13 +177,14 @@ public class DynmapUtils {
 
     /**
      * Remove continuous chunks merges for a town from our Dynmap marketset.
+     * Does nothing if Dynmap isn't installed.
      */
-    private void removeOptimizedMarkersetTown( final Town town ) {
-        if (plugin.getMarketset() == null) return;
+    public void removeOptimizedMarkersetTown( final Town town ) {
+        if (markerset == null) return;
 
         Integer areaNumber = 0;
         while (true) {
-            AreaMarker marker = plugin.getMarketset().findAreaMarker( town.getName() + "_" + areaNumber.toString() );
+            AreaMarker marker = markerset.findAreaMarker( town.getName() + "_" + areaNumber.toString() );
             if (marker != null)
                 marker.deleteMarker();
             else
@@ -146,9 +196,10 @@ public class DynmapUtils {
     /**
      * Add all chunks of a Town to our Dynmap marketset.
      * Continuous chunks are merged into one area.
+     * Does nothing if Dynmap isn't installed.
      */
     public void optimizedAddMarkersetTown( final Town town ) {
-        if (plugin.getMarketset() == null) return;
+        if (markerset == null) return;
 
         // Remove already existant areas
         removeOptimizedMarkersetTown(town);
@@ -282,7 +333,7 @@ public class DynmapUtils {
                 cornersZ_converted[i] = cornersZ.get(i);
             }
 
-            AreaMarker marker = plugin.getMarketset().createAreaMarker(nameOfArea, town.getName(), false, areasWorld.get(nameOfArea), cornersX_converted, cornersZ_converted, false);
+            AreaMarker marker = markerset.createAreaMarker(nameOfArea, town.getName(), false, areasWorld.get(nameOfArea), cornersX_converted, cornersZ_converted, false);
             marker.setLineStyle(0, 0.0, 0xFFFFFF);
             marker.setFillStyle(0.35, 0xFFFFFF);
             marker.setLabel(town.getName());
