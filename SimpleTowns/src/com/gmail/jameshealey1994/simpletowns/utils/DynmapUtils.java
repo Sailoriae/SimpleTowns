@@ -202,6 +202,7 @@ public class DynmapUtils {
         if (markerset == null) return;
 
         // Remove already existant areas
+        removeFastMarkersetTown(town);
         removeOptimizedMarkersetTown(town);
 
         // Init main data containers
