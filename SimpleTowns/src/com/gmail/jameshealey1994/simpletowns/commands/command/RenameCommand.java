@@ -112,10 +112,18 @@ public class RenameCommand extends STCommand {
         // Save config
         plugin.saveConfig();
 
+        // Remove chunks from our Dynmap markerset and from WorldGuard regions
+        plugin.getDynmapUtils().removeTownFromMarkerset(town);
+        plugin.getWorldGuardUtils().removeTownRegions(town);
+
         // Rename town locally
         plugin.getTowns().remove(town.getName().toLowerCase());
         town.setName(newName);
         plugin.getTowns().put(newName.toLowerCase(), town);
+
+        // Add chunks to our Dynmap markerset and to WorldGuard regions
+        plugin.getWorldGuardUtils().addTownRegions(town);
+        plugin.getDynmapUtils().addTownToMarkerset(town);
 
         // Log to file
         new Logger(plugin).log(localisation.get(LocalisationEntry.LOG_TOWN_RENAMED, oldName, town.getName(), sender.getName()));
