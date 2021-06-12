@@ -1,5 +1,6 @@
 package com.gmail.jameshealey1994.simpletowns.object;
 
+import com.gmail.jameshealey1994.simpletowns.utils.ChunksToAreas;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -36,6 +37,11 @@ public class Town {
     private Set<TownChunk> chunks = new HashSet<>();
 
     /**
+     * The merging continuous chunks to areas system for the Town.
+     */
+    private ChunksToAreas chunksToAreas;
+
+    /**
      * Constructor - Initialises name, adds creator to leaders, and chunk to
      * chunks.
      *
@@ -49,6 +55,7 @@ public class Town {
         this.name = name;
         this.leaders.add(creator);
         this.chunks.add(chunk);
+        this.chunksToAreas = new ChunksToAreas(this);
     }
 
     /**
@@ -64,6 +71,7 @@ public class Town {
         this.leaders = leaders;
         this.citizens = citizens;
         this.chunks = chunks;
+        this.chunksToAreas = new ChunksToAreas(this);
     }
 
     /**
@@ -148,6 +156,15 @@ public class Town {
      */
     public boolean hasMember(UUID playerUUID) {
         return (getCitizens().contains(playerUUID) || getLeaders().contains(playerUUID));
+    }
+
+    /**
+     * Returns the merging continuous chunks to areas system for the Town.
+     *
+     * @return      ChunksToAreas
+     */
+    public ChunksToAreas getChunksToAreas() {
+        return chunksToAreas;
     }
 
     @Override

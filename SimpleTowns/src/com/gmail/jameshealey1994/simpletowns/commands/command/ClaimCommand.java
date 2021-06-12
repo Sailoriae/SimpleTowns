@@ -8,7 +8,6 @@ import com.gmail.jameshealey1994.simpletowns.object.Town;
 import com.gmail.jameshealey1994.simpletowns.object.TownChunk;
 import com.gmail.jameshealey1994.simpletowns.permissions.STPermission;
 import com.gmail.jameshealey1994.simpletowns.utils.Logger;
-import com.gmail.jameshealey1994.simpletowns.utils.DynmapUtils;
 import java.util.List;
 import org.bukkit.Chunk;
 import org.bukkit.command.CommandSender;
@@ -93,7 +92,9 @@ public class ClaimCommand extends STCommand {
         town.getTownChunks().add(townchunk);
 
         // Add chunk to our Dynmap markerset
-        plugin.getDynmapUtils().addMarkersetChunk(town, townchunk);
+        plugin.getDynmapUtils().removeTownFromMarkerset(town);
+        town.getChunksToAreas().update();
+        plugin.getDynmapUtils().addTownToMarkerset(town);
 
         // Log to file
         new Logger(plugin).log(localisation.get(LocalisationEntry.LOG_CHUNK_CLAIMED, town.getName(), sender.getName(), worldname, chunkX, chunkZ));

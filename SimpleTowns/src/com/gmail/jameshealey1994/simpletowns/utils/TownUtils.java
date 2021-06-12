@@ -4,7 +4,6 @@ import com.gmail.jameshealey1994.simpletowns.SimpleTowns;
 import com.gmail.jameshealey1994.simpletowns.object.Town;
 import com.gmail.jameshealey1994.simpletowns.object.TownChunk;
 import com.gmail.jameshealey1994.simpletowns.utils.PlayernameUUID;
-import com.gmail.jameshealey1994.simpletowns.utils.DynmapUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -140,17 +139,15 @@ public class TownUtils {
                         final int chunkZ = Integer.parseInt(chunk.substring(chunk.indexOf(',') + 1));
                         final TownChunk townchunk = new TownChunk(chunkX, chunkZ, world);
                         chunks.add(townchunk);
-
-                        // Add the chunk to our Dynmap markerset
-//                        plugin.getDynmapUtils().addMarkersetChunk(townname, world, chunkX, chunkZ);
                     }
                 }
                 final Town town = new Town(townname, leaders, citizens, chunks);
+                town.getChunksToAreas().update(); // This merge continuous chunks into areas
                 townsFromConfig.put(townname.toLowerCase(), town);
 
-                // This merge continuous chunks into areas
+                // Update our Dynmap markerset
                 try {
-                    plugin.getDynmapUtils().optimizedAddMarkersetTown( town );
+                    plugin.getDynmapUtils().addTownToMarkerset(town);
                 } catch (Exception ex) {
                     plugin.getLogger().log(Level.WARNING, "{0} creating town areas {1} on Dynmap: {2}", new Object[] {ex.getClass().getName(), townname, ex.getMessage()});
                 }
