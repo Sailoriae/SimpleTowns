@@ -82,9 +82,11 @@ public class UnclaimCommand extends STCommand {
         final TownChunk townchunk = new TownChunk(chunk);
         town.getTownChunks().remove(townchunk);
 
-        // Remove chunk from our Dynmap markerset
+        // Remove chunk from our Dynmap markerset and from WorldGuard regions
         plugin.getDynmapUtils().removeTownFromMarkerset(town);
+        plugin.getWorldGuardUtils().removeTownRegions(town);
         town.getChunksToAreas().update();
+        plugin.getWorldGuardUtils().addTownRegions(town);
         plugin.getDynmapUtils().addTownToMarkerset(town);
 
         // Log to file

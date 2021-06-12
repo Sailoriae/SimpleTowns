@@ -91,9 +91,11 @@ public class ClaimCommand extends STCommand {
         plugin.getConfig().set(path + town.getName() + ".Chunks." + worldname, chunks);
         town.getTownChunks().add(townchunk);
 
-        // Add chunk to our Dynmap markerset
+        // Add chunk to our Dynmap markerset and to WorldGuard regions
         plugin.getDynmapUtils().removeTownFromMarkerset(town);
+        plugin.getWorldGuardUtils().removeTownRegions(town);
         town.getChunksToAreas().update();
+        plugin.getWorldGuardUtils().addTownRegions(town);
         plugin.getDynmapUtils().addTownToMarkerset(town);
 
         // Log to file

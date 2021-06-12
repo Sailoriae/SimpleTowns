@@ -132,6 +132,9 @@ public class RemoveCommand extends STCommand {
         plugin.getConfig().set(leadersPath, leaders);
         plugin.getTown(town.getName()).getLeaders().remove(playerUUID);
 
+        // Remove citizen from WorldGuard regions
+        plugin.getWorldGuardUtils().removeMemberFromRegions(town, playerUUID);
+
         // Log to file
         new Logger(plugin).log(localisation.get(LocalisationEntry.LOG_TOWN_MEMBER_REMOVED, town.getName(), sender.getName(), playername));
 
