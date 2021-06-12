@@ -3,6 +3,7 @@ package com.gmail.jameshealey1994.simpletowns.utils;
 import com.gmail.jameshealey1994.simpletowns.SimpleTowns;
 import com.gmail.jameshealey1994.simpletowns.localisation.LocalisationEntry;
 import com.gmail.jameshealey1994.simpletowns.object.Town;
+import com.gmail.jameshealey1994.simpletowns.permissions.STPermission;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
@@ -15,6 +16,9 @@ import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.flags.registry.FlagConflictException;
 import com.sk89q.worldguard.internal.platform.StringMatcher;
+import org.bukkit.plugin.RegisteredServiceProvider;
+import net.milkbowl.vault.permission.Permission;
+import java.lang.NoClassDefFoundError;
 import java.util.ArrayList;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -52,6 +56,11 @@ public class WorldGuardUtils {
      */
     private static StateFlag IS_SIMPLETOWN_REGION;
 
+    /**
+     * Permissions through Vault.
+     */
+    private Permission vaultPermissions;
+
     public void onLoad( SimpleTowns plugin ) {
         this.plugin = plugin;
         if (!LAND_PROTECTION_BY_WORLDGUARD) return;
@@ -69,6 +78,14 @@ public class WorldGuardUtils {
         container = WorldGuard.getInstance().getPlatform().getRegionContainer();
         matcher = WorldGuard.getInstance().getPlatform().getMatcher();
         plugin.getLogger().log(Level.INFO, "Hooked into WorldGuard");
+
+        try {
+            RegisteredServiceProvider<Permission> rsp = plugin.getServer().getServicesManager().getRegistration(Permission.class);
+            vaultPermissions = rsp.getProvider();
+            plugin.getLogger().log(Level.INFO, "Hooked into Vault");
+        } catch ( NoClassDefFoundError e ) {
+            vaultPermissions = null;
+        }
     }
 
     private String normalizeName( String name ) {
@@ -171,6 +188,11 @@ public class WorldGuardUtils {
             region.setFlag(IS_SIMPLETOWN_REGION, StateFlag.State.ALLOW);
 
             world = town.getChunksToAreas().areasWorld.get(nameOfArea);
+            if (vaultPermissions != null)
+                for (String groupName : vaultPermissions.getGroups())
+                    if (vaultPermissions.groupHas(world, groupName, STPermission.ADMIN.getPermission().getName()))
+                        region.getMembers().addGroup(groupName);
+
             regions = container.get(matcher.getWorldByName(world));
             if (regions != null)
                 regions.addRegion(region); // If the region already exists, it will be overwritten
