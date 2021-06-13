@@ -95,8 +95,8 @@ public class DynmapUtils {
             }
 
             AreaMarker marker = markerset.createAreaMarker(nameOfArea, town.getName(), false, town.getChunksToAreas().areasWorld.get(nameOfArea), cornersX_converted, cornersZ_converted, false);
-            marker.setLineStyle(0, 0.0, 0xFFFFFF);
-            marker.setFillStyle(0.35, 0xFFFFFF);
+            marker.setLineStyle(2, 0.5, 0xFFFFFF);
+            marker.setFillStyle(0.2, 0xFFFFFF);
             marker.setLabel(town.getName());
         }
     }
