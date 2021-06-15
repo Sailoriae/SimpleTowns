@@ -5,14 +5,14 @@ import com.gmail.jameshealey1994.simpletowns.commands.STCommandEnvironment;
 import com.gmail.jameshealey1994.simpletowns.commands.STCommandExecutor;
 import com.gmail.jameshealey1994.simpletowns.commands.command.HelpCommand;
 import com.gmail.jameshealey1994.simpletowns.commands.command.STCommand;
+import com.gmail.jameshealey1994.simpletowns.hooks.DynmapHook;
+import com.gmail.jameshealey1994.simpletowns.hooks.WorldGuardHook;
 import com.gmail.jameshealey1994.simpletowns.listeners.STListener;
 import com.gmail.jameshealey1994.simpletowns.localisation.Localisable;
 import com.gmail.jameshealey1994.simpletowns.localisation.Localisation;
 import com.gmail.jameshealey1994.simpletowns.object.Town;
 import com.gmail.jameshealey1994.simpletowns.object.TownChunk;
 import com.gmail.jameshealey1994.simpletowns.utils.TownUtils;
-import com.gmail.jameshealey1994.simpletowns.utils.DynmapUtils;
-import com.gmail.jameshealey1994.simpletowns.utils.WorldGuardUtils;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -46,18 +46,18 @@ public class SimpleTowns extends JavaPlugin implements Localisable {
     /**
      * Our Dynmap hook class.
      */
-    private DynmapUtils dynmapUtils = null;
+    private DynmapHook dynmap = null;
 
     /**
      * Our WorldGuard hook class.
      */
-    private WorldGuardUtils worldGuardUtils;
+    private WorldGuardHook worldguard;
 
     @Override
     public void onLoad() {
         // Create our WorldGuard hook
-        this.worldGuardUtils = new WorldGuardUtils();
-        worldGuardUtils.onLoad(this);
+        this.worldguard = new WorldGuardHook();
+        worldguard.onLoad(this);
     }
 
     @Override
@@ -67,16 +67,16 @@ public class SimpleTowns extends JavaPlugin implements Localisable {
         saveDefaultConfig();
 
         // Create our Dynmap hook (It manages itself the case where Dynmap isn't installed)
-        this.dynmapUtils = new DynmapUtils();
+        this.dynmap = new DynmapHook();
 
         // Create our WorldGuard hook
-        worldGuardUtils.onEnable();
+        worldguard.onEnable();
 
         // Load towns from config
         this.towns = new TownUtils(this).getTownsFromConfig();
 
         // Register events
-        if (!worldGuardUtils.LAND_PROTECTION_BY_WORLDGUARD)
+        if (!worldguard.LAND_PROTECTION_BY_WORLDGUARD)
             getServer().getPluginManager().registerEvents(new STListener(this), this);
 
         // Set command executors and default command
@@ -86,10 +86,10 @@ public class SimpleTowns extends JavaPlugin implements Localisable {
     @Override
     public void onDisable() {
         // Delete our Dynmap markerset (Like Dynmap-WorldGuard plugin)
-        this.dynmapUtils.deleteMarkerset();
+        this.dynmap.deleteMarkerset();
 
         // Delete all WorldGuard regions that we created
-        this.worldGuardUtils.clearWorldGuard();
+        this.worldguard.clearWorldGuard();
     }
 
     /**
@@ -181,18 +181,18 @@ public class SimpleTowns extends JavaPlugin implements Localisable {
     /**
      * Returns our Dynmap hook class.
      *
-     * @return      DynmapUtils, always exists if plugin is enabled
+     * @return      DynmapHook, always exists if plugin is enabled
      */
-    public DynmapUtils getDynmapUtils() {
-        return this.dynmapUtils;
+    public DynmapHook getDynmapHook() {
+        return this.dynmap;
     }
 
     /**
      * Returns our WorldGuard hook class.
      *
-     * @return      WorldGuardUtils, always exists if plugin is enabled
+     * @return      WorldGuardHook, always exists if plugin is enabled
      */
-    public WorldGuardUtils getWorldGuardUtils() {
-        return this.worldGuardUtils;
+    public WorldGuardHook getWorldGuardHook() {
+        return this.worldguard;
     }
 }

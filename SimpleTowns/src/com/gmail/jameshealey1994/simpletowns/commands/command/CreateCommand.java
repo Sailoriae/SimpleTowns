@@ -136,8 +136,8 @@ public class CreateCommand extends STCommand {
 
         // Add the first chunk to our Dynmap markerset and to WorldGuard regions
         plugin.getTown(townname).getChunksToAreas().update();
-        plugin.getWorldGuardUtils().addTownRegions(plugin.getTown(townname));
-        plugin.getDynmapUtils().addTownToMarkerset(plugin.getTown(townname));
+        plugin.getWorldGuardHook().addTownRegions(plugin.getTown(townname));
+        plugin.getDynmapHook().addTownToMarkerset(plugin.getTown(townname));
 
         // Log to file
         logger.log(localisation.get(LocalisationEntry.LOG_CHUNK_CLAIMED, townname, player.getName(), worldname, chunkX, chunkZ));

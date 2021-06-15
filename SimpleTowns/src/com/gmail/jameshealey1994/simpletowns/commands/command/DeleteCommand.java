@@ -65,8 +65,8 @@ public class DeleteCommand extends STCommand {
         }
 
         // Remove chunks from our Dynmap markerset and from WorldGuard regions
-        plugin.getDynmapUtils().removeTownFromMarkerset(town);
-        plugin.getWorldGuardUtils().removeTownRegions(town);
+        plugin.getDynmapHook().removeTownFromMarkerset(town);
+        plugin.getWorldGuardHook().removeTownRegions(town);
 
         // Delete town locally
         plugin.getTowns().remove(town.getName().toLowerCase());

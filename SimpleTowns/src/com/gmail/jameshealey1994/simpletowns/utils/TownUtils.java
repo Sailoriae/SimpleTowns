@@ -70,12 +70,12 @@ public class TownUtils {
      */
     public Map<String, Town> getTownsFromConfig() {
         // Delete and create our Dynmap market
-        plugin.getDynmapUtils().deleteMarkerset(); // Delete in case of reload command
-        if (plugin.getDynmapUtils().checkDynmapAndCreateMarkerset(this.plugin))
+        plugin.getDynmapHook().deleteMarkerset(); // Delete in case of reload command
+        if (plugin.getDynmapHook().checkDynmapAndCreateMarkerset(this.plugin))
             plugin.getLogger().log(Level.INFO, "Hooked into Dynmap");
 
         // Clear WorldGuard in case of reload command
-        plugin.getWorldGuardUtils().clearWorldGuard();
+        plugin.getWorldGuardHook().clearWorldGuard();
 
         final ConfigurationSection townConfigSection = new ConfigUtils(plugin).getConfigSection(PATH);
         final Map<String, Town> townsFromConfig = new HashMap<>();
@@ -150,14 +150,14 @@ public class TownUtils {
 
                 // Update our Dynmap markerset
                 try {
-                    plugin.getDynmapUtils().addTownToMarkerset(town);
+                    plugin.getDynmapHook().addTownToMarkerset(town);
                 } catch (Exception ex) {
                     plugin.getLogger().log(Level.WARNING, "{0} creating town areas {1} on Dynmap: {2}", new Object[] {ex.getClass().getName(), townname, ex.getMessage()});
                 }
 
                 // Create WorldGuard regions
                 try {
-                    plugin.getWorldGuardUtils().addTownRegions(town);
+                    plugin.getWorldGuardHook().addTownRegions(town);
                 } catch (Exception ex) {
                     plugin.getLogger().log(Level.WARNING, "{0} creating town areas {1} on WorldGuard: {2}", new Object[] {ex.getClass().getName(), townname, ex.getMessage()});
                 }

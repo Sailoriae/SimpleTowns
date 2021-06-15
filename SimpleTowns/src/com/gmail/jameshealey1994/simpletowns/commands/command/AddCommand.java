@@ -135,7 +135,7 @@ public class AddCommand extends STCommand {
         plugin.getConfig().set(path, citizens);
 
         // Add citizen to WorldGuard regions
-        plugin.getWorldGuardUtils().addMemberToRegions(town, playerUUID);
+        plugin.getWorldGuardHook().addMemberToRegions(town, playerUUID);
 
         // Log to file
         new Logger(plugin).log(localisation.get(LocalisationEntry.LOG_CITIZEN_ADDED, town.getName(), sender.getName(), fullPlayerName));

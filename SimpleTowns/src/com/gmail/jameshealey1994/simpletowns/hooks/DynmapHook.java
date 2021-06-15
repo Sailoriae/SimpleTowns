@@ -1,4 +1,4 @@
-package com.gmail.jameshealey1994.simpletowns.utils;
+package com.gmail.jameshealey1994.simpletowns.hooks;
 
 import com.gmail.jameshealey1994.simpletowns.SimpleTowns;
 import com.gmail.jameshealey1994.simpletowns.localisation.LocalisationEntry;
@@ -12,7 +12,7 @@ import org.dynmap.markers.AreaMarker;
  * Utility methods that interact with the Dynmap API.
  * This class has to be instantiated ONCE by the plugin.
  */
-public class DynmapUtils {
+public class DynmapHook {
 
     /**
      * Our Dynmap markerset.

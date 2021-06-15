@@ -1,4 +1,4 @@
-package com.gmail.jameshealey1994.simpletowns.utils;
+package com.gmail.jameshealey1994.simpletowns.hooks;
 
 import com.gmail.jameshealey1994.simpletowns.SimpleTowns;
 import com.gmail.jameshealey1994.simpletowns.localisation.LocalisationEntry;
@@ -28,7 +28,7 @@ import java.text.Normalizer;
  * Utility methods that interact with the WorldGuard API.
  * Because SimpleTowns doesn't handle the security, so we create regions on WorldGuard.
  */
-public class WorldGuardUtils {
+public class WorldGuardHook {
 
     /**
      * Disable this system, it will enable our internal security system.
